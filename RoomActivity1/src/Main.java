@@ -1,9 +1,26 @@
 import java.util.Scanner;
-
 public class Main {
   static Scanner scan = new Scanner(System.in);
   static String name, gender, roomType;
   static int age, nightsStatic;
+
+  static final String[] consumables = {"Coke", "Rice", "Chicken Adobo",  "Beef Steak", "Halo-Halo"};
+  static final String[] rooms = {"Small Room", "Medium Room", "Large Room"};
+  static final double[] roomPrices = {500.00, 700.00, 1000.00};
+  static final double[] foodPrices = {50.00, 5.00, 100.00, 175.00, 250.00};
+
+  private int ChoiceHandler(int min, int max) {
+    int choice;
+
+    do {
+      choice = scan.nextInt();
+
+      if (choice < min || choice > max) {
+        System.err.printf("Invalid choice. Please select a number between %d and %d: ", min, max);
+      }
+    } while (choice < min || choice > max);
+    return choice;
+  }
 
   private void GetCustomerDetails() {
     System.out.print("Enter customer name: ");
@@ -17,104 +34,57 @@ public class Main {
   private double RoomBill() {
     int nights;
     int choice = 0;
-    boolean roomPicked = false;
-    while (!roomPicked) {
-      System.out.println("Select the Room type: ");
-      System.out.println("Small (500 per night)");
-      System.out.println("Medium (700 per night)");
-      System.out.println("Large (1000 per night)");
-      System.out.print("Choice (1/2/3): ");
-      choice = scan.nextInt();
-      switch (choice) {
-        case 1:
-          roomType = "Small Room";
-          roomPicked = true;
-          break;
 
-        case 2:
-          roomType = "Medium Room";
-          roomPicked = true;
-          break;
-
-        case 3:
-          roomType = "Large Room";
-          roomPicked = true;
-          break;
-
-        default:
-          System.err.println("Invalid choice!");
-      }
+    System.out.println("\nSelect the Room type: ");
+    for (int i = 0; i < roomPrices.length; i++) {
+      System.out.printf("%s (%.2f per night)%n", rooms[i], roomPrices[i]);
     }
+    System.out.print("Choice (1/2/3): ");
+    choice = ChoiceHandler(1, 3);
+
+    roomType = rooms[choice-1];
     System.out.print("How many nights? ");
     nights = scan.nextInt();
     nightsStatic = nights;
-    return ComputeRoomBill(choice, nights);
-  }
-
-  private double ComputeRoomBill(int choice, int nights) {
-    double bill = 0.00;
-
-    if (choice == 1) {
-      bill = 500.00 * nights; 
-    } else if (choice == 2) {
-      bill = 700.00 * nights;
-    } else {
-      bill = 1000.00 * nights; 
-    }
-
-    return bill;
+    return roomPrices[choice-1] * nights;
   }
 
   private double ComputeMenuBill() {
     System.out.println("Please select Food and Beverages");
     double bill = 0.00;
-    
-    while (true) {
-      System.out.println("1. Coke (50.00)\t4. Beef Steak (175.00)");
-      System.out.println("2. Rice (5.00)\t5. Halo-Halo (250.00)");
-      System.out.println("3. Chicken Adobo (100.00)\t");
-      System.out.println("\n6. Exit");
-      System.out.print("Choice: ");
-      int choice = scan.nextInt();
-      if (choice == 6) return bill;
-      else if (choice < 6) bill += ComputeFoodBill(choice);
-      else System.err.println("Invalid selection! ");
-    }  
-  }
 
-  private double ComputeFoodBill(int choice) {
+    while (true) {
+      System.out.printf("%nFood and Drinks bill: %.2f%n", bill);
+
+      for (int i = 0; i < consumables.length; i++) {
+        System.out.printf("%d. %s (%.2f)%n", i + 1, consumables[i], foodPrices[i]);
+      }
+      System.out.println("6. Exit");
+      System.out.print("Choice: ");
+      int choice = ChoiceHandler(1, 6);
+
+      if (choice == 6) {
+        if (bill <= 0.00) {
+          System.err.println("Please select at least 1 food and drink.");
+          continue;
+        }
+        return bill;
+      }
+
+      bill += ComputeFood(choice);
+    }
+}
+
+  private double ComputeFood(int choice) {
     double foodBill = 0.00;
     System.out.print("Enter quantity of item: ");
     int quantity = scan.nextInt();
-    switch (choice) {
-      case 1:
-        foodBill += 50.00 * quantity;
-        break;
-
-      case 2:
-        foodBill += 5.00 * quantity;
-        break;
-
-      case 3:
-        foodBill += 100.00 * quantity;
-        break;
-
-      case 4:
-        foodBill += 175.00 * quantity;
-        break;
-
-      case 5:
-        foodBill += 250.00 * quantity;
-        break;
-
-      default:
-        break;
-    }
+    foodBill = foodPrices[choice-1] * quantity;
     return foodBill;
   }
 
   private void ReceiptPrinter(int nights, double roomBill, double menuBill, double change) {
-    System.out.printf("Name: %s%n", name);
+    System.out.printf("%nName: %s%n", name);
     System.out.printf("Room type: %s%n", roomType);
     System.out.printf("Number of nights: %d%n", nights);
     System.out.printf("Food and Drinks: %.2f%n", menuBill);
@@ -124,16 +94,20 @@ public class Main {
   }
 
   private void AskForPayment(int nights, double roomBill, double menuBill) {
-    System.out.printf("Amount due: %.2f%n", (roomBill + menuBill));
+    double total = roomBill + menuBill;
+
+    System.out.printf("%nAmount due: %.2f%n", total);
     System.out.print("Payment: ");
-    double payment = scan.nextDouble();
-    double finalBill = (roomBill + menuBill) - payment;
-    while (finalBill > 0) {
-      System.out.printf("Payment insufficient. You are %.2f short.", finalBill);
-      finalBill -= scan.nextDouble();
+
+    double balance = total - scan.nextDouble();
+
+    while (balance > 0) {
+      System.out.printf("Payment insufficient. You are %.2f short.%nPayment: ", balance);
+      balance -= scan.nextDouble();
     }
-    ReceiptPrinter(nights, roomBill, menuBill, Math.abs(finalBill));
-    System.out.println("Thank you for staying with us! We hope to see you again!");
+
+    ReceiptPrinter(nights, roomBill, menuBill, Math.abs(balance));
+    System.out.println("\nThank you for staying with us! We hope to see you again!");
   }
 
   public static void main(String[] args) {
