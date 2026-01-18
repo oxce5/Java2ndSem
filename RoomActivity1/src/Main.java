@@ -83,20 +83,20 @@ public class Main {
     return foodBill;
   }
 
-  private void ReceiptPrinter(int nights, double roomBill, double menuBill, double change) {
+  private void ReceiptPrinter(int nights, double roomBill, double menuBill, double change, boolean withChange) {
     System.out.printf("%nName: %s%n", name);
     System.out.printf("Room type: %s%n", roomType);
     System.out.printf("Number of nights: %d%n", nights);
     System.out.printf("Food and Drinks: %.2f%n", menuBill);
     System.out.printf("Room Cost: %.2f%n", roomBill);
     System.out.printf("Amount due: %.2f%n", (roomBill + menuBill));
-    System.out.printf("Change: %.2f%n", change);
+    if (withChange) System.out.printf("Change: %.2f%n", change);
   }
 
   private void AskForPayment(int nights, double roomBill, double menuBill) {
     double total = roomBill + menuBill;
 
-    System.out.printf("%nAmount due: %.2f%n", total);
+    ReceiptPrinter(nights, roomBill, menuBill, 0, false);
     System.out.print("Payment: ");
 
     double balance = total - scan.nextDouble();
@@ -106,7 +106,7 @@ public class Main {
       balance -= scan.nextDouble();
     }
 
-    ReceiptPrinter(nights, roomBill, menuBill, Math.abs(balance));
+    ReceiptPrinter(nights, roomBill, menuBill, Math.abs(balance), true);
     System.out.println("\nThank you for staying with us! We hope to see you again!");
   }
 
