@@ -1,0 +1,5 @@
+Book 1: 20 — Needs repair
+Book 2: 50 — Needs repair
+Book 3: 80 — Good condition
+Book 4: 80 — Good condition
+Book 5: 100 — Excellent condition
