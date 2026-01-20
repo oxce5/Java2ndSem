@@ -51,9 +51,9 @@ public class Main {
       }
     }
   }
-  private void findAllInstances(int[] array, int target) {
+  private int[] findAllInstances(int[] array, int target) {
     for (int i = 0; i < array.length; i++) {
-      if (array[i] == target) System.out.printf("%d is found at index %d.%n", target, array[i]);
+      if (array[i] == target) System.out.printf("%d is found at index %d.%n", target, i);
     }
   }
   private void printArray(int[] array) {
@@ -77,10 +77,9 @@ public class Main {
     main.printArray(main.removeAndSort(arr3.clone(), 50));
 
     System.out.println("\nACTIVITY 5");
-    int sum = 0;
+    double sum = 0;
     for (int i : arr2) 
       sum += i;
-    int average = sum / arr2.length;
-    System.out.printf("Sum: %d%n", average);
+    System.out.printf("Average: %.2f%n", sum / arr2.length);
   }
 }
