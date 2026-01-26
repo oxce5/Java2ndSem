@@ -8,19 +8,30 @@ public class Item {
   private String name;
   private int value;
 
-  public Item() {}
+  public Item() {
+  }
 
-  public void SetName(String name) { this.name = name; }
-  public void SetValue(int value) { this.value = value; }
+  public void SetName(String name) {
+    this.name = name;
+  }
 
-  public String GetName() { return this.name; }
-  public int GetValue() { return this.value; }
+  public void SetValue(int value) {
+    this.value = value;
+  }
+
+  public String GetName() {
+    return this.name;
+  }
+
+  public int GetValue() {
+    return this.value;
+  }
 
   public ArrayList<Item> ParseFile(String fileName) {
     ArrayList<Item> records = new ArrayList<Item>();
     try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
       String line;
-      while((line = reader.readLine()) != null) {
+      while ((line = reader.readLine()) != null) {
         String[] tempArray = line.split("\\s-\\s");
         Item item = new Item();
         item.SetName(tempArray[0]);
@@ -36,7 +47,7 @@ public class Item {
 
   public void WriteToFile(ArrayList<Item> items) {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter("data.txt"))) {
-      for ( Item item : items) {
+      for (Item item : items) {
         writer.write(item.GetName() + " - " + item.GetValue());
         writer.newLine();
       }
