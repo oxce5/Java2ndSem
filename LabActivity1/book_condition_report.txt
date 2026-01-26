@@ -3,3 +3,13 @@ Book 2: 50 — Needs repair
 Book 3: 80 — Good condition
 Book 4: 80 — Good condition
 Book 5: 100 — Excellent condition
+Book 6: 20 — Needs repair
+Book 7: 50 — Needs repair
+Book 8: 85 — Good condition
+Book 9: 0 — Needs repair
+Book 10: 0 — Needs repair
+Book 11: 10 — Needs repair
+Book 12: 20 — Needs repair
+Book 13: 85 — Good condition
+Book 14: 0 — Needs repair
+Book 15: 0 — Needs repair

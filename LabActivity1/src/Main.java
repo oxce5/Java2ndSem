@@ -6,10 +6,10 @@ import java.util.Scanner;
 
 public class Main {
   static Scanner scan = new Scanner(System.in);
-  private int ChoiceHandler(int min, int max) {
+  private int ChoiceHandler(int min, int max, int count) {
     int choice;
     do {
-      System.out.print("Choice: ");
+      System.out.printf("Book %d: ", count);
       choice = scan.nextInt();
       if (choice < min || choice > max) {
         System.err.printf("Invalid choice. Please select a number between %d and %d.%n", min, max);
@@ -22,9 +22,10 @@ public class Main {
   private int[] CreateBookArray() {
     System.out.print("How many books to inspect? ");
     int[] bookConditions = new int[scan.nextInt()];
+    System.out.println("Enter book conditions (0-100)");
 
     for (int i = 0; i < bookConditions.length; i++) {
-      bookConditions[i] = ChoiceHandler(0, 100);
+      bookConditions[i] = ChoiceHandler(0, 100, (i+1));
     }
     return bookConditions;
   }
@@ -49,6 +50,7 @@ public class Main {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
       writer.write(data);
       writer.close();
+      System.out.printf("File saved to %s.", fileName);
     } catch (Exception e) {
       //TODO: handle exception
     }
@@ -61,10 +63,6 @@ public class Main {
         lastLine = line;
       }
       String[] tempArray = lastLine.split("\\s|:");
-      // for (String string : tempArray) {
-      //   System.out.println(string);
-      //
-      // }
       return Integer.parseInt(tempArray[1]);
     } catch (Exception e) {
       e.printStackTrace();
