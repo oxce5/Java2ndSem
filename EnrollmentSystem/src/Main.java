@@ -1,3 +1,4 @@
+import java.awt.Component;
 import java.awt.Insets;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -33,37 +34,39 @@ public class Main extends JFrame {
     new Main();
   }
 
-  Main() {
-    setLayout(null);
+   private void createLabelAndFields(Component parent) {
+    String[] labels = {
+      "Student name",
+      "Student address",
+      "Student course",
+      "Student age",
+      "Last school attended"
+    };
 
-    JLabel name = new JLabel("Student name");
-    JLabel address = new JLabel("Student address");
-    JLabel course = new JLabel("Student course");
-    JLabel age = new JLabel("Student age");
-    JLabel last = new JLabel("Last school attended");
+    int y = 35;
+    JLabel[] labelArray = new JLabel[labels.length];
+    JTextField[] fieldArray = new JTextField[labels.length];
+    for (int i = 0; i < labels.length; i++) {
+      labelArray[i] = new JLabel(labels[i]);
+      labelArray[i].setBounds(50, y, 150, 50);
+      add(labelArray[i]);
 
-    add(name).setBounds(50 + margins.left, 20 * 1 + margins.top, 200, 50);
-    add(address).setBounds(50 + margins.left, 5 * 20 + margins.top, 200, 50);
-    add(course).setBounds(50 + margins.left, 10 * 20 + margins.top, 200, 50);
-    add(age).setBounds(50 + margins.left, 15 * 20 + margins.top, 200, 50);
-    add(last).setBounds(50 + margins.left, 20 * 20 + margins.top, 200, 50);
+      fieldArray[i] = new JTextField();
+      fieldArray[i].setBounds(50, y + 40, 150, 40);
+      add(fieldArray[i]);
 
-    JTextField nameField = new JTextField();
-    JTextField addressField = new JTextField();
-    JTextField courseField = new JTextField();
-    JTextField ageField = new JTextField();
-    JTextField lastField = new JTextField();
-
-    add(nameField).setBounds(50 + margins.left, 70 * 1 + margins.top, 200, 40);
-    add(addressField).setBounds(50 + margins.left, 70 * 2 + margins.top, 200, 40);
-    add(courseField).setBounds(50 + margins.left, 80 * 3 + margins.top, 200, 40);
-    add(ageField).setBounds(50 + margins.left, 85 * 4 + margins.top, 200, 40);
-    add(lastField).setBounds(50 + margins.left, 110 * 4 + margins.top, 200, 40);
+      y += 70;
+    }
 
     JButton enroll = new JButton("ENROLL");
     add(enroll).setBounds(50 + margins.left, 500, 100, 40);
+    enroll.addActionListener(e -> extracted(fieldArray));
+  }
 
-    enroll.addActionListener(e -> extracted(nameField, addressField, courseField, ageField, lastField));
+  Main() {
+    setLayout(null);
+    createLabelAndFields(getContentPane());
+
 
     setVisible(true);
     setTitle("Student Enrollment System");
@@ -73,22 +76,16 @@ public class Main extends JFrame {
     setResizable(true);
   }
 
-  private void extracted(JTextField nameField, JTextField addressField, JTextField courseField, JTextField ageField, JTextField lastField) {
-    String name = nameField.getText();
-    String address = addressField.getText();
-    String course = courseField.getText();
-    String age = ageField.getText();
-    String last = lastField.getText();
+  private void extracted(JTextField[] fields) {
+    StringBuilder sb =  new StringBuilder();
+    for (int i = 0; i < fields.length; i++) {
+      sb.append(fields[i].getText()).append(" | ");
+    }
+    sb.append("\n");
 
-    writeFile("EnrolledStudents.txt", formatData(name, address, course, age, last));
-    emptyFields(nameField, addressField, courseField, ageField, lastField);
-  }
-  
-  private void emptyFields(JTextField nameField, JTextField addressField, JTextField courseField, JTextField ageField, JTextField lastField) {
-    nameField.setText("");
-    addressField.setText("");
-    courseField.setText("");
-    ageField.setText("");
-    lastField.setText("");
+    writeFile("EnrolledStudents.txt", sb.toString());
+    for (int i = 0; i < fields.length; i++) {
+      fields[i].setText("");
+    }
   }
 }
