@@ -1,26 +1,14 @@
-import java.awt.Component;
-import java.awt.Insets;
-import java.awt.ScrollPane;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.io.*;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 public class Main extends JFrame {
+  // TODO: Avoid statics
   static private DefaultTableModel tableModel;
   static private JTable table;
   static private JScrollPane scroll;
+  // TODO: Use class Rectangle or migrate to a layout manager
   static final Insets margins = new Insets(5, 5, 5, 5);
 
   private void writeFile(String filename, String content) {
@@ -62,8 +50,23 @@ public class Main extends JFrame {
     JButton enroll = new JButton("ENROLL");
     add(enroll).setBounds(50 + margins.left, 500, 100, 40);
     enroll.addActionListener(e -> extracted(fieldArray, parent));
-
   }
+
+  private void extracted(JTextField[] fields, Component parent) {
+    StringBuilder sb = new StringBuilder();
+    String[] content = new String[fields.length];
+    for (int i = 0; i < fields.length; i++) {
+      content[i] = fields[i].getText();
+    }
+    sb.append(String.format("%s | %s | %s | %s | %s%n", content[0], content[1], content[2], content[3], content[4]));
+
+    writeFile("EnrolledStudents.txt", sb.toString());
+    for (int i = 0; i < fields.length; i++) {
+      fields[i].setText("");
+    }
+    refreshTable(parent, "EnrolledStudents.txt", tableModel, true);
+  }
+
 
   private void createTable(Component parent) {
     String[] colHeader = {
@@ -81,35 +84,26 @@ public class Main extends JFrame {
     add(scroll).setBounds(250, y, 650, 500);
   }
 
-  private void refreshTable(Component parent, String fileName, DefaultTableModel model, boolean getLastLine) {
+  private void refreshTable(Component parent, String fileName,
+      DefaultTableModel model, boolean getLastLine) {
     try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
       String line;
-      String[] lines = null;
+      String[] lastLine = null;
       while ((line = reader.readLine()) != null) {
-        lines = line.split("\s\\|\s");
+        String[] columns = line.split("\\s\\|\\s");
         if (!getLastLine) {
-          model.addRow(lines);
+          model.addRow(columns);
           continue;
         }
+
+        lastLine = columns;
       }
-      model.addRow(lines);
+      if (getLastLine && lastLine != null)
+        model.addRow(lastLine);
+
     } catch (Exception e) {
-      // TODO: handle exception
+      e.printStackTrace();
     }
-  }
-
-  private void extracted(JTextField[] fields, Component parent) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < fields.length; i++) {
-      sb.append(fields[i].getText()).append(" | ");
-    }
-    sb.append("\n");
-
-    writeFile("EnrolledStudents.txt", sb.toString());
-    for (int i = 0; i < fields.length; i++) {
-      fields[i].setText("");
-    }
-    refreshTable(parent, "EnrolledStudents.txt", tableModel, true);
   }
 
   Main() {
@@ -129,5 +123,4 @@ public class Main extends JFrame {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> new Main().setVisible(true));
   }
-
 }
