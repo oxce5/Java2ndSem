@@ -47,8 +47,8 @@ public class Main extends JFrame {
         "Last school"
     };
 
-    var tableModel = new DefaultTableModel();
-    createFields(parent, null, labels, columnLabels);
+    var tableModel = new DefaultTableModel(columnLabels, 0);
+    createFields(parent, tableModel, labels, columnLabels);
     refreshTable(parent, "EnrolledStudents.txt", tableModel, false);
 
     setVisible(true);
