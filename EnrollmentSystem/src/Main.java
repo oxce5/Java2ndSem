@@ -1,15 +1,63 @@
-import java.awt.*;
-import java.io.*;
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 public class Main extends JFrame {
-  // TODO: Avoid statics
-  static private DefaultTableModel tableModel;
-  static private JTable table;
-  static private JScrollPane scroll;
   // TODO: Use class Rectangle or migrate to a layout manager
+  static final Rectangle positions = new Rectangle(35, 35, 35, 35);
   static final Insets margins = new Insets(5, 5, 5, 5);
+
+  public static void main(String[] args) {
+    SwingUtilities.invokeLater(() -> new Main().setVisible(true));
+  }
+
+  Main() {
+    setLayout(null);
+    Component parent = getContentPane();
+
+    String[] labels = {
+        "Student name",
+        "Student address",
+        "Student course",
+        "Student age",
+        "Last school attended"
+    };
+
+    String[] columnLabels = {
+        "Name",
+        "Address",
+        "Curse",
+        "Age",
+        "Last school"
+    };
+
+    var tableModel = new DefaultTableModel();
+    createFields(parent, null, labels, columnLabels);
+    refreshTable(parent, "EnrolledStudents.txt", tableModel, false);
+
+    setVisible(true);
+    setTitle("Student Enrollment System");
+    setDefaultCloseOperation(EXIT_ON_CLOSE);
+    setSize(950, 600);
+    setLocationRelativeTo(null);
+    setResizable(true);
+  }
 
   private void writeFile(String filename, String content) {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {
@@ -22,18 +70,10 @@ public class Main extends JFrame {
     }
   }
 
-  private void createLabelAndFields(Component parent) {
-    String[] labels = {
-        "Student name",
-        "Student address",
-        "Student course",
-        "Student age",
-        "Last school attended"
-    };
-
+  private void createFields(Component parent, DefaultTableModel tableModel, String[] labels, String[] columnHeader) {
     int y = 35;
-    JLabel[] labelArray = new JLabel[labels.length];
-    JTextField[] fieldArray = new JTextField[labels.length];
+    var labelArray = new JLabel[labels.length];
+    var fieldArray = new JTextField[labels.length];
     for (int i = 0; i < labels.length; i++) {
       labelArray[i] = new JLabel(labels[i]);
       labelArray[i].setBounds(50, y, 150, 50);
@@ -46,41 +86,30 @@ public class Main extends JFrame {
       y += 70;
     }
 
-    createTable(parent);
+    createTable(parent, tableModel, columnHeader);
     JButton enroll = new JButton("ENROLL");
     add(enroll).setBounds(50 + margins.left, 500, 100, 40);
-    enroll.addActionListener(e -> extracted(fieldArray, parent));
+    enroll.addActionListener(e -> extracted(fieldArray, parent, tableModel));
   }
 
-  private void extracted(JTextField[] fields, Component parent) {
+  private void extracted(JTextField[] fields, Component parent, DefaultTableModel tableModel) {
     StringBuilder sb = new StringBuilder();
-    String[] content = new String[fields.length];
-    for (int i = 0; i < fields.length; i++) {
-      content[i] = fields[i].getText();
-    }
-    sb.append(String.format("%s | %s | %s | %s | %s%n", content[0], content[1], content[2], content[3], content[4]));
+    var content = Arrays.stream(fields)
+        .map(JTextField::getText)
+        .toArray(String[]::new);
+
+    sb.append(String.join(" | ", content)).append('\n');
 
     writeFile("EnrolledStudents.txt", sb.toString());
-    for (int i = 0; i < fields.length; i++) {
-      fields[i].setText("");
-    }
+    for (var field : fields)
+      field.setText("");
     refreshTable(parent, "EnrolledStudents.txt", tableModel, true);
   }
 
-
-  private void createTable(Component parent) {
-    String[] colHeader = {
-        "Name",
-        "Address",
-        "Course",
-        "Age",
-        "Last school"
-    };
-
+  private void createTable(Component parent, DefaultTableModel tableModel, String[] columnHeader) {
     int y = 35;
-    tableModel = new DefaultTableModel(colHeader, 0);
-    table = new JTable(tableModel);
-    scroll = new JScrollPane(table);
+    var table = new JTable(tableModel);
+    var scroll = new JScrollPane(table);
     add(scroll).setBounds(250, y, 650, 500);
   }
 
@@ -104,23 +133,5 @@ public class Main extends JFrame {
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-
-  Main() {
-    setLayout(null);
-    Component parent = getContentPane();
-    createLabelAndFields(parent);
-    refreshTable(parent, "EnrolledStudents.txt", tableModel, false);
-
-    setVisible(true);
-    setTitle("Student Enrollment System");
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
-    setSize(950, 600);
-    setLocationRelativeTo(null);
-    setResizable(true);
-  }
-
-  public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> new Main().setVisible(true));
   }
 }
