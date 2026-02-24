@@ -44,10 +44,9 @@ public class IOutils {
         if (parts.length == 8) {
           tableModel.addRow(parts);
           records.add(new Employee(
-            parts[0],
-            Double.parseDouble(parts[1]),
-            Double.parseDouble(parts[2]))
-          );
+              parts[0],
+              Double.parseDouble(parts[1]),
+              Double.parseDouble(parts[2])));
         }
       }
       return records;
@@ -60,16 +59,40 @@ public class IOutils {
 
   public void saveDataToFile(String DATA_FILE, DefaultTableModel tableModel, ArrayList<Employee> records) {
     try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(DATA_FILE))) {
-      for (int i = 0; i < tableModel.getRowCount(); i++) {
-        ArrayList<String> row = new ArrayList<>();
-        for (int j = 0; j < tableModel.getColumnCount(); j++) {
-          row.add((tableModel.getValueAt(i, j).toString()));
+      if (records != null) {
+        for (Employee emp : records) {
+          double[] payroll = computePay(emp.getHourlyRate(), emp.getHoursWorked(), 0.12);
+          String line = String.format("%s,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+              emp.getName(),
+              emp.getHourlyRate(),
+              emp.getHoursWorked(),
+              payroll[0],
+              payroll[1],
+              payroll[2],
+              payroll[3],
+              payroll[4]);
+          writer.write(line);
+          writer.newLine();
         }
-        writer.write(String.join(",", row));
-        writer.newLine();
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
+
+  public String formatPayResult(String name, double hourlyRate, double hoursWorked, double[] breakdown) {
+    return String.format(
+        "Employee name: %s\n" +
+            "Employee hourly rate: %.2f\n" +
+            "Employee hours worked: %.2f\n" +
+            "─────────────────\n" +
+            "Regular Pay: %.2f\n" +
+            "Overtime Pay: %.2f\n" +
+            "Gross Pay: %.2f\n" +
+            "Tax (12%%): %.2f\n" +
+            "─────────────────\n" +
+            "Net Pay: %.2f",
+        name, hourlyRate, hoursWorked, breakdown[0], breakdown[1], breakdown[2], breakdown[3], breakdown[4]);
+  }
+
 }
