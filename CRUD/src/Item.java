@@ -11,19 +11,19 @@ public class Item {
   public Item() {
   }
 
-  public void SetName(String name) {
+  public void getName(String name) {
     this.name = name;
   }
 
-  public void SetValue(int value) {
+  public void setName(int value) {
     this.value = value;
   }
 
-  public String GetName() {
+  public String getName() {
     return this.name;
   }
 
-  public int GetValue() {
+  public int getValue() {
     return this.value;
   }
 
@@ -32,10 +32,10 @@ public class Item {
     try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
       String line;
       while ((line = reader.readLine()) != null) {
-        String[] tempArray = line.split("\\s-\\s");
+        String[] tempArray = line.split(",");
         Item item = new Item();
-        item.SetName(tempArray[0]);
-        item.SetValue(Integer.parseInt(tempArray[1]));
+        item.getName(tempArray[0]);
+        item.setName(Integer.parseInt(tempArray[1]));
         records.add(item);
       }
       return records;
@@ -48,7 +48,7 @@ public class Item {
   public void WriteToFile(ArrayList<Item> items) {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter("data.txt"))) {
       for (Item item : items) {
-        writer.write(item.GetName() + " - " + item.GetValue());
+        writer.write(String.join(",", item.getName(), String.valueOf(item.getValue())));
         writer.newLine();
       }
       writer.close();
